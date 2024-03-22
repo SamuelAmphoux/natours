@@ -1,6 +1,12 @@
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 
+process.on('unhandledRejection', (err) => {
+  console.log('UNHANDLED REJECTION! TERMINATING');
+  console.log(err);
+  process.exit(1);
+});
+
 dotenv.config({ path: './config.env' });
 
 const DB = process.env.DATABASE.replace(
@@ -18,7 +24,15 @@ const app = require('./app');
 
 // Start server
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`App running on port ${port}`);
+});
+
+process.on('uncaughtException', (err) => {
+  console.log('UNCAUGHT EXCEPTION! TERMINATING');
+  console.log(err);
+  server.close(() => {
+    process.exit(1);
+  });
 });
