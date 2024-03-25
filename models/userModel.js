@@ -37,6 +37,7 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords must be identicals',
     },
   },
+  passwordChangedAt: Date,
 });
 
 userSchema.pre('save', async function (next) {
@@ -56,6 +57,20 @@ userSchema.methods.correctPassword = async function (
   userPassword,
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = this.passwordChangedAt.getTime() / 1000;
+
+    // If JWTTimestamp is less than changedTimestamp, it means that the token
+    // was issued BEFORE the last password change so it is TRUE
+    // that the password was changed
+    return JWTTimestamp < changedTimestamp;
+  }
+
+  // False means not changed meaning
+  return false;
 };
 
 const User = mongoose.model('User', userSchema);
