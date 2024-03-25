@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
@@ -50,6 +51,20 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
-  console.log('o/');
+  // 1) Check JWT existence
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  )
+    token = req.headers.authorization.split(' ')[1];
+  console.log(token);
+
+  // 2) Verify JWT
+  if (!token) return next(new AppError('You are not currently logged in', 401));
+
+  //  3) Check if user still exists
+
+  // 4) Check if user changed password after JWT was issued?
   next();
 });
