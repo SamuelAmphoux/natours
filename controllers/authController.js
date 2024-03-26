@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const { promisify } = require('util');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const jwt = require('jsonwebtoken');
@@ -138,4 +139,32 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
-exports.resetPassword = (req, res, next) => {};
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  // Get user based on the token
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  const user = await User.findOne({
+    passWordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  // Set the new password if: token is still valid and user found
+  if (!user) return next(new AppError('Token invalid or expired', 400));
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passWordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+
+  // Update the changedpasswordat property for the current user
+  // Log the user in, send JWT to the client
+  const token = signToken(user._id);
+
+  res.status(200).json({
+    status: 'success log',
+    token,
+  });
+});
