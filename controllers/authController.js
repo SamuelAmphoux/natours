@@ -12,6 +12,18 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
+const createAndSendJWTToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -20,15 +32,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
   });
 
-  const token = signToken(newUser._id);
-
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createAndSendJWTToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -45,12 +49,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) If ok, send token to client
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: 'success log',
-    token,
-  });
+  createAndSendJWTToken(user, 201, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -161,10 +160,27 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // Update the changedpasswordat property for the current user
   // Log the user in, send JWT to the client
-  const token = signToken(user._id);
+  createAndSendJWTToken(user, 201, res);
+});
 
-  res.status(200).json({
-    status: 'success log',
-    token,
-  });
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // Get user from collection
+  let { user } = req;
+  user = await User.findById(user._id).select('+password');
+
+  // Check if password is correct
+  if (
+    !user ||
+    !(await user.correctPassword(req.body.password, user.password))
+  ) {
+    return next(new AppError('Incorrect password', 401));
+  }
+
+  // If so, update the password
+  user.password = req.body.newPassword;
+  user.passwordConfirm = req.body.newPasswordConfirm;
+  await user.save();
+
+  // Log user in, send JWT
+  createAndSendJWTToken(user, 201, res);
 });
