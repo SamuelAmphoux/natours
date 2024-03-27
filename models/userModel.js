@@ -46,8 +46,14 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passWordResetToken: String,
   passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
+// Middleware to encrypt password before saving it to DB
 userSchema.pre('save', async function (next) {
   // Only run if password was actually modified
   if (!this.isModified('password')) return next();
@@ -60,10 +66,17 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+// Middleware to modify the passwordChangedAt property on a user
 userSchema.pre('save', function (next) {
   if (!this.isModified('password') || this.isNew) return next();
 
   this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+// Query middleware to ensure only active users are retrieved
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
   next();
 });
 
