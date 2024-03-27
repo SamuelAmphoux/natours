@@ -74,12 +74,6 @@ userSchema.pre('save', function (next) {
   next();
 });
 
-userSchema.post('save', function (next) {
-  this.password = undefined;
-  this.active = undefined;
-  this.role = undefined;
-});
-
 // Query middleware to ensure only active users are retrieved
 userSchema.pre(/^find/, function (next) {
   this.find({ active: { $ne: false } });
