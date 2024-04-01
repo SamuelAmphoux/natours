@@ -126,6 +126,14 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
+// Virtual populate
+// We indicate where to find the field with the ID in both documents
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id',
+});
+
 // Document Middleware : runs before the .save() and .create() [NOT .insertMany]
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
