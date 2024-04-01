@@ -12,9 +12,11 @@ const {
   getMonthlyPlan,
 } = require('../controllers/tourController');
 const authController = require('../controllers/authController');
-const reviewController = require('../controllers/reviewController');
+const reviewRouter = require('./reviewRoutes');
 
 const router = express.Router();
+
+router.use('/:tourId/reviews', reviewRouter);
 
 // Middleware to check id validity (unecessary after schema implementation)
 // router.param('id', checkId);
@@ -31,13 +33,6 @@ router
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),
     deleteTour,
-  );
-router
-  .route('/:tourId/reviews')
-  .post(
-    authController.protect,
-    authController.restrictTo('user'),
-    reviewController.createReview,
   );
 
 module.exports = router;
