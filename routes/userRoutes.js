@@ -16,21 +16,28 @@ const {
   resetPassword,
   updatePassword,
   protect,
+  restrictTo,
 } = require('../controllers/authController');
 
 const router = express.Router();
 
 router.post('/signup', signup);
 router.post('/login', login);
-
 router.post('/forgotPassword', forgotPassword);
 router.patch('/resetPassword/:token', resetPassword);
-router.patch('/updatePassword', protect, updatePassword);
-router.patch('/updateMe', protect, updateMe);
-router.delete('/deleteMe', protect, deleteMe);
+
+// All routes after this line are protected
+router.use(protect);
+
+router.get('/me', getMe, getUser);
+router.patch('/updateMe', updateMe);
+router.patch('/updatePassword', updatePassword);
+router.delete('/deleteMe', deleteMe);
+
+// All routes after this line require admin role to access
+router.use(restrictTo('admin'));
 
 router.route('/').get(getAllUsers).post(createUser);
-router.get('/me', protect, getMe, getUser);
 router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
 
 module.exports = router;
