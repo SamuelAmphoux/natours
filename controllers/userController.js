@@ -11,7 +11,10 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-exports.getAllUsers = factory.getAll(User);
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   // Create error if user POSTs password data
@@ -48,14 +51,16 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getUser = factory.getOne(User);
-
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: 'error',
     message: 'Route not defined. Please use /signup',
   });
 };
+
+exports.getUser = factory.getOne(User);
+
+exports.getAllUsers = factory.getAll(User);
 
 // Do NOT update password through this route
 exports.updateUser = factory.updateOne(User);
