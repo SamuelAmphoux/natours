@@ -60,6 +60,8 @@ exports.getAll = (Model) =>
       .limitFields()
       .paginate();
     const doc = await features.query;
+    // // The .explain() allows us to observe in details the behavior of the query, for example how mny documents were reviewed before finding desired results
+    // const doc = await features.query.explain();
 
     res.status(200).json({
       status: 'success',
