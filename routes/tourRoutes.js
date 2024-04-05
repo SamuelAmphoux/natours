@@ -11,6 +11,7 @@ const {
   getTourStats,
   getMonthlyPlan,
   getToursWithin,
+  getDistances,
 } = require('../controllers/tourController');
 const { protect, restrictTo } = require('../controllers/authController');
 const reviewRouter = require('./reviewRoutes');
@@ -18,6 +19,8 @@ const reviewRouter = require('./reviewRoutes');
 const router = express.Router();
 
 router.use('/:tourId/reviews', reviewRouter);
+
+router.route('/distances/:latlng/unit/:unit').get(getDistances);
 
 router.route('/top-5-tours').get(aliasTopTours, getAllTours);
 router.route('/tour-stats').get(getTourStats);

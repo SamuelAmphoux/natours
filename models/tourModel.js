@@ -184,9 +184,25 @@ tourSchema.post(/^find/, function (docs, next) {
   next();
 });
 
+const matchStage = {
+  $match: {
+    secretTour: { $ne: true },
+  },
+};
+
 // Aggregation middleware
 tourSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+  const firstStage = this.pipeline()[0];
+
+  if (
+    firstStage &&
+    Object.prototype.hasOwnProperty.call(firstStage, '$geoNear')
+  ) {
+    this.pipeline().splice(1, 0, matchStage);
+  } else {
+    this.pipeline().unshift(matchStage);
+  }
+
   next();
 });
 
