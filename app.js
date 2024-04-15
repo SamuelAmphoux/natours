@@ -1,4 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -12,14 +13,35 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const viewRouter = require('./routes/viewRoutes');
 
 // Initiating app
 const app = express();
+
+// Setting pug for templates
+app.set('view engine', 'pug');
+// Locating views
+app.set('views', path.join(__dirname, 'views'));
+// Serve static files (located in the public folder)
+app.use(express.static(path.join(__dirname, 'public')));
 
 // // Global Middlewares
 
 // Set security HTTP headers
 app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", 'https://api.mapbox.com', 'blob:', "'self'"],
+      connectSrc: [
+        "'self'",
+        'https://api.mapbox.com',
+        'https://events.mapbox.com',
+      ],
+    },
+  }),
+);
 
 // Development logging
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
@@ -62,9 +84,6 @@ app.use(
   }),
 );
 
-// Serve static files (located in the public folder)
-app.use(express.static(`${__dirname}/public`));
-
 // test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
@@ -73,6 +92,8 @@ app.use((req, res, next) => {
 });
 
 // Mounting Routers
+// Route to retrieve the Mapbox access token
+app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
