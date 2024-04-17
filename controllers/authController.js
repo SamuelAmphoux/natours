@@ -66,6 +66,14 @@ exports.login = catchAsync(async (req, res, next) => {
   createAndSendJWTToken(user, 201, res);
 });
 
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+};
+
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Check JWT existence
   let token;
@@ -101,6 +109,30 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // 5) Grant access to protected route
   req.user = currentUser;
+  next();
+});
+
+// Only for rendered pages, no errors
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  if (req.cookies.jwt && req.cookies.jwt !== 'loggedout') {
+    // 2) Verify JWT
+    const decoded = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET,
+    );
+
+    //  3) Check if user still exists
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      return next();
+    }
+
+    // 4) Check if user changed password after JWT was issued?
+    if (currentUser.changedPasswordAfter(decoded.iat)) return next();
+
+    // There is indeed a logged in user
+    res.locals.user = currentUser;
+  }
   next();
 });
 
