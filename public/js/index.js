@@ -39,9 +39,14 @@ if (settingsForm) {
   settingsForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
+    const form = new FormData();
     const email = document.getElementById('email')?.value;
     const name = document.getElementById('name')?.value;
-    if (email && name) updateSettings({ email, name }, 'data');
+    const photo = document.getElementById('photo')?.files[0];
+    if (email) form.append('email', email);
+    if (name) form.append('name', name);
+    if (photo) form.append('photo', photo);
+    if (email && name) updateSettings(form, 'data');
   });
 }
 
