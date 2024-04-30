@@ -4,7 +4,7 @@ const {
   getTour,
   getLoginForm,
   getAccount,
-  updateUserData,
+  getMyTours,
 } = require('../controllers/viewsController');
 const authController = require('../controllers/authController');
 const bookingController = require('../controllers/bookingController');
@@ -12,8 +12,7 @@ const bookingController = require('../controllers/bookingController');
 const router = express.Router();
 
 router.get('/me', authController.protect, getAccount);
-// // Without API option
-// router.post('/submit-user-data', authController.protect, updateUserData);
+router.get('/my-tours', authController.protect, getMyTours);
 
 router.use(authController.isLoggedIn);
 
