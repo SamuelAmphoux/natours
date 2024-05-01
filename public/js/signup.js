@@ -6,22 +6,22 @@ axios.defaults.withCredentials = true;
 const baseUrl = window.location.origin;
 const api = '/api/v1';
 
-// type is either password or data
-export const updateSettings = async (data, type) => {
+export const signup = async (name, email, password, passwordConfirm) => {
   try {
-    const url = type === 'data' ? 'updateMe' : 'updatePassword';
     const res = await axios({
-      method: 'PATCH',
-      url: `${baseUrl}${api}/users/${url}`,
-      data,
+      method: 'POST',
+      url: `${baseUrl}${api}/users/signup`,
+      data: {
+        name,
+        email,
+        password,
+        passwordConfirm,
+      },
     });
     if (res.data.status === 'success') {
-      showAlert(
-        'success',
-        `Successuflly updated ${type === 'data' ? 'settings' : 'password'}!`,
-      );
+      showAlert('success', 'Signed up successfully!');
       window.setTimeout(() => {
-        location.reload();
+        location.assign('/');
       }, 1500);
     }
   } catch (err) {

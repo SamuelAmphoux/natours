@@ -10038,20 +10038,53 @@
     }
   };
 
-  // public/js/updateSettings.js
+  // public/js/signup.js
   axios_default.defaults.withCredentials = true;
   var baseUrl2 = window.location.origin;
   var api2 = "/api/v1";
+  var signup = async (name, email, password, passwordConfirm) => {
+    try {
+      const res = await axios_default({
+        method: "POST",
+        url: `${baseUrl2}${api2}/users/signup`,
+        data: {
+          name,
+          email,
+          password,
+          passwordConfirm
+        }
+      });
+      if (res.data.status === "success") {
+        showAlert("success", "Signed up successfully!");
+        window.setTimeout(() => {
+          location.assign("/");
+        }, 1500);
+      }
+    } catch (err) {
+      showAlert("error", err.response.data.message);
+    }
+  };
+
+  // public/js/updateSettings.js
+  axios_default.defaults.withCredentials = true;
+  var baseUrl3 = window.location.origin;
+  var api3 = "/api/v1";
   var updateSettings = async (data, type) => {
     try {
       const url = type === "data" ? "updateMe" : "updatePassword";
       const res = await axios_default({
         method: "PATCH",
-        url: `${baseUrl2}${api2}/users/${url}`,
+        url: `${baseUrl3}${api3}/users/${url}`,
         data
       });
       if (res.data.status === "success") {
-        showAlert("success", `Successuflly updated ${type.toUpperCase()}!`);
+        showAlert(
+          "success",
+          `Successuflly updated ${type === "data" ? "settings" : "password"}!`
+        );
+        window.setTimeout(() => {
+          location.reload();
+        }, 1500);
       }
     } catch (err) {
       showAlert("error", err.response.data.message);
@@ -10061,12 +10094,12 @@
   // public/js/stripe.js
   var Stripe = require_stripe_cjs_worker();
   axios_default.defaults.withCredentials = true;
-  var baseUrl3 = window.location.origin;
-  var api3 = "/api/v1";
+  var baseUrl4 = window.location.origin;
+  var api4 = "/api/v1";
   var bookTour = async (tourId) => {
     try {
       const session = await axios_default(
-        `${baseUrl3}${api3}/bookings/checkout-session/${tourId}`
+        `${baseUrl4}${api4}/bookings/checkout-session/${tourId}`
       );
       if (session.data.session.url)
         self.location = session.data.session.url;
@@ -10079,6 +10112,7 @@
   // public/js/index.js
   var mapEl = document.getElementById("map");
   var loginForm = document.querySelector(".form--login");
+  var signupForm = document.querySelector(".form--signup");
   var logoutBtn = document.querySelector(".nav__el--logout");
   var settingsForm = document.querySelector(".form-user-data");
   var userPasswordForm = document.querySelector(".form-user-settings");
@@ -10091,10 +10125,25 @@
   if (loginForm) {
     loginForm.addEventListener("submit", (e) => {
       e.preventDefault();
+      const button = loginForm.querySelector(".btn");
+      button.textContent = "Processing...";
       const email = document.getElementById("email")?.value;
       const password = document.getElementById("password")?.value;
       if (email && password)
         login(email, password);
+    });
+  }
+  if (signupForm) {
+    signupForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const button = signupForm.querySelector(".btn");
+      button.textContent = "Processing...";
+      const name = document.getElementById("name")?.value;
+      const email = document.getElementById("email")?.value;
+      const password = document.getElementById("password")?.value;
+      const passwordConfirm = document.getElementById("password-confirm")?.value;
+      if (name && email && password && passwordConfirm)
+        signup(name, email, password, passwordConfirm);
     });
   }
   if (logoutBtn) {
@@ -10106,6 +10155,8 @@
   if (settingsForm) {
     settingsForm.addEventListener("submit", (e) => {
       e.preventDefault();
+      const button = settingsForm.querySelector(".btn");
+      button.textContent = "Processing...";
       const form = new FormData();
       const email = document.getElementById("email")?.value;
       const name = document.getElementById("name")?.value;
@@ -10123,6 +10174,8 @@
   if (userPasswordForm) {
     userPasswordForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+      const button = userPasswordForm.querySelector(".btn");
+      button.textContent = "Processing...";
       document.querySelector(".btn--save-password").textContent = "Updating";
       const password = document.getElementById("password-current")?.value;
       const newPassword = document.getElementById("password")?.value;

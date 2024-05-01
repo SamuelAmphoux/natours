@@ -3,6 +3,7 @@ const {
   getOverview,
   getTour,
   getLoginForm,
+  getSignupForm,
   getAccount,
   getMyTours,
 } = require('../controllers/viewsController');
@@ -19,5 +20,6 @@ router.use(authController.isLoggedIn);
 router.get('/', bookingController.createBookingCheckout, getOverview);
 router.get('/tour/:slug', getTour);
 router.get('/login', getLoginForm);
+router.get('/signup', getSignupForm);
 
 module.exports = router;
