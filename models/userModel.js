@@ -59,8 +59,8 @@ userSchema.pre('save', async function (next) {
   // Only run if password was actually modified
   if (!this.isModified('password')) return next();
 
-  // Hash the password with CPU cost of 12
-  this.password = await bcrypt.hash(this.password, 16);
+  // Hash the password with CPU cost of 10 (higher value = increased process time)
+  this.password = await bcrypt.hash(this.password, 10);
 
   // Delete passwordConfirm field
   this.passwordConfirm = undefined;
