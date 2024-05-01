@@ -3,14 +3,14 @@ import axios from 'axios';
 import { showAlert } from './alert';
 
 axios.defaults.withCredentials = true;
-// const baseUrl = 'http://localhost:3000';
+const baseUrl = window.location.origin;
 const api = '/api/v1';
 
 export const login = async (email, password) => {
   try {
     const res = await axios({
       method: 'POST',
-      url: `//${api}/users/login`,
+      url: `${baseUrl}/${api}/users/login`,
       data: {
         email,
         password,
@@ -31,7 +31,7 @@ export const logout = async () => {
   try {
     const res = await axios({
       method: 'GET',
-      url: `//${api}/users/logout`,
+      url: `${baseUrl}/${api}/users/logout`,
     });
     if (res.data.status === 'success') {
       if (location.pathname === '/me') {
