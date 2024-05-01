@@ -9,8 +9,10 @@ const api = '/api/v1';
 export const login = async (email, password) => {
   try {
     const res = await axios({
-      method: 'POST',
-      url: `${baseUrl}/${api}/users/login`,
+      // method: 'POST',
+      // url: `${baseUrl}/${api}/users/login`,
+      method: 'GET',
+      url: 'www.google.com',
       data: {
         email,
         password,
