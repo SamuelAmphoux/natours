@@ -9,10 +9,8 @@ const api = '/api/v1';
 export const login = async (email, password) => {
   try {
     const res = await axios({
-      // method: 'POST',
-      // url: `${baseUrl}/${api}/users/login`,
-      method: 'GET',
-      url: 'www.google.com',
+      method: 'POST',
+      url: `${baseUrl}${api}/users/login`,
       data: {
         email,
         password,
@@ -33,7 +31,7 @@ export const logout = async () => {
   try {
     const res = await axios({
       method: 'GET',
-      url: `${baseUrl}/${api}/users/logout`,
+      url: `${baseUrl}${api}/users/logout`,
     });
     if (res.data.status === 'success') {
       if (location.pathname === '/me') {

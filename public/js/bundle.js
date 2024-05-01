@@ -9998,7 +9998,7 @@
 
   // public/js/login.js
   axios_default.defaults.withCredentials = true;
-  var baseUrl = "http://localhost:3000";
+  var baseUrl = window.location.origin;
   var api = "/api/v1";
   var login = async (email, password) => {
     try {
@@ -10040,14 +10040,13 @@
 
   // public/js/updateSettings.js
   axios_default.defaults.withCredentials = true;
-  var baseUrl2 = "http://localhost:3000";
   var api2 = "/api/v1";
   var updateSettings = async (data, type) => {
     try {
       const url = type === "data" ? "updateMe" : "updatePassword";
       const res = await axios_default({
         method: "PATCH",
-        url: `${baseUrl2}${api2}/users/${url}`,
+        url: `/${api2}/users/${url}`,
         data
       });
       if (res.data.status === "success") {
@@ -10061,13 +10060,10 @@
   // public/js/stripe.js
   var Stripe = require_stripe_cjs_worker();
   axios_default.defaults.withCredentials = true;
-  var baseUrl3 = "http://localhost:3000";
   var api3 = "/api/v1";
   var bookTour = async (tourId) => {
     try {
-      const session = await axios_default(
-        `${baseUrl3}${api3}/bookings/checkout-session/${tourId}`
-      );
+      const session = await axios_default(`/${api3}/bookings/checkout-session/${tourId}`);
       if (session.data.session.url)
         self.location = session.data.session.url;
     } catch (err) {
