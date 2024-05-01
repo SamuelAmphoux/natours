@@ -63,7 +63,7 @@ block content
         img.picture-box__img(src=`/img/tours/${img}`, alt=`${tour.name} tour ${i + 1}`, class=`.picture-box__img--${i + 1}`)
 
   section.section-map
-    - const mapboxToken = (process.env.NODE_ENV === 'development') ? process.env.MAPBOX_TOKEN : ''
+    - const mapboxToken = process.env.MAPBOX_TOKEN
       #map(data-locations=`${JSON.stringify(tour.locations)}`, data-start-location=`${JSON.stringify(tour.startLocation)}`, data-map-token=mapboxToken)
 
   section.section-reviews
