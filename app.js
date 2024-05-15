@@ -40,28 +40,25 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Set security HTTP headers
 app.use(helmet());
 app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'", 'https://js.stripe.com/v3/'],
-      scriptSrc: [
-        "'self'",
-        'https://api.mapbox.com',
-        'blob:',
-        'https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js',
-        'https://js.stripe.com/v3/',
-      ],
-      connectSrc: [
-        "'self'",
-        'https://api.mapbox.com',
-        'https://events.mapbox.com',
-        'https://checkout.stripe.com',
-      ],
-    },
-  }),
-);
-
-app.use(
   helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'", 'https://js.stripe.com/v3/'],
+        scriptSrc: [
+          "'self'",
+          'https://api.mapbox.com',
+          'blob:',
+          'https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js',
+          'https://js.stripe.com/v3/',
+        ],
+        connectSrc: [
+          "'self'",
+          'https://api.mapbox.com',
+          'https://events.mapbox.com',
+          'https://checkout.stripe.com',
+        ],
+      },
+    },
     referrerPolicy: {
       policy: ['origin'],
     },
