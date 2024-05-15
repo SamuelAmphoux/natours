@@ -12,7 +12,7 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
-const createAndSendJWTToken = (user, statusCode, res) => {
+const createAndSendJWTToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
 
   const cookieOptions = {
@@ -22,7 +22,7 @@ const createAndSendJWTToken = (user, statusCode, res) => {
     httpOnly: true,
   };
 
-  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+  if (req.secure) cookieOptions.secure = true;
   res.cookie('jwt', token, cookieOptions);
 
   // Remove password from output
@@ -48,7 +48,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   const url = `${req.protocol}://${req.get('host')}/me`;
   await new Email(newUser, url).sendWelcome();
 
-  createAndSendJWTToken(newUser, 201, res);
+  createAndSendJWTToken(newUser, 201, req, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -65,7 +65,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) If ok, send token to client
-  createAndSendJWTToken(user, 201, res);
+  createAndSendJWTToken(user, 201, req, res);
 });
 
 exports.logout = (req, res) => {
@@ -206,7 +206,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // Update the changedpasswordat property for the current user
   // Log the user in, send JWT to the client
-  createAndSendJWTToken(user, 201, res);
+  createAndSendJWTToken(user, 201, req, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
@@ -228,5 +228,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // Log user in, send JWT
-  createAndSendJWTToken(user, 201, res);
+  createAndSendJWTToken(user, 201, req, res);
 });

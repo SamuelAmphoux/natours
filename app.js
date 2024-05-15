@@ -9,6 +9,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const cors = require('cors');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -21,6 +22,8 @@ const viewRouter = require('./routes/viewRoutes');
 // Initiating app
 const app = express();
 
+// Built in express to allow proxys
+// app.enable('trust proxy');
 // Setting pug for templates
 app.set('view engine', 'pug');
 // Locating views
@@ -29,6 +32,10 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // // Global Middlewares
+
+// Implement CORS - modify headers Access-control-allow-origin to *
+app.use(cors());
+app.options('*', cors());
 
 // Set security HTTP headers
 app.use(helmet());
